@@ -1,0 +1,42 @@
+<html><head><title>Very simple money contribution calculator</title></head><body>
+<p>Very simple money contribution calculator</p>
+Target:
+<input type="number" value="1000" id="target">
+<button id="distributeDollar">Distribute (dollars)</button>
+<button id="distributeCent">Distribute (cents)</button>
+<p>Each contributed</p>
+<ol id="list">
+</ol>
+<button id="add">+ Person</button><button id="remove">- Person</button>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const list = document.getElementById("list")
+        const distribute = processValue => () => {
+            const target = parseFloat(document.getElementById("target").value)
+            const count = list.childElementCount
+            for (c of list.children) {
+                const shouldPay = c.querySelector("#shouldPay")
+                shouldPay.setAttribute("value", processValue (target / count))
+                shouldPay.dispatchEvent(new Event("input"))
+            }
+        }
+        document.getElementById("distributeDollar").addEventListener("click", distribute(Math.ceil))
+        document.getElementById("distributeCent").addEventListener("click", distribute(x => Math.ceil(x * 100) / 100))
+        document.getElementById("add").addEventListener("click", () => {
+            const child = document.createElement("li")
+            child.innerHTML = `<input type="text" placeholder="Name" id="name"> should pay $<input type="number" value="0" placeholder="money" id="shouldPay">, paid $<input type="number" value="0" placeholder="money" id="paid">, <span id="result">missing $0</span><br/>`
+            const updateResult = () => {
+                var calc = child.querySelector("#shouldPay").value - child.querySelector("#paid").value
+                child.querySelector("#result").innerText = calc < 0 ? `paid $${-calc} in excess` : `missing $${calc}`
+            }
+            child.querySelector("#paid").addEventListener("input", updateResult)
+            child.querySelector("#shouldPay").addEventListener("input", updateResult)
+            list.appendChild(child)
+        })
+        document.getElementById("remove").addEventListener("click", () =>
+            list.lastChild ? list.removeChild(list.lastChild) : undefined)
+        document.getElementById("add").click()
+        document.getElementById("add").click()
+    })
+</script>
+</body></html>
